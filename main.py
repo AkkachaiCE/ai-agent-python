@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from google import genai
+from google.genai import types
 import sys
 
 
@@ -17,9 +18,14 @@ def main():
     client = genai.Client(api_key=api_key)
 
     model = 'gemini-2.0-flash-001'
-    contents = " ".join(args)
+    user_prompt = " ".join(args)
 
-    response = client.models.generate_content(model=model, contents=contents)
+    # Set User: (role) for prompt message
+    messages = [
+        types.Content(role="user", parts=[types.Part(text=user_prompt)]),
+    ]
+
+    response = client.models.generate_content(model=model, contents=messages)
     print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
     print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
     print(f"The response is:\n{response.text}")
